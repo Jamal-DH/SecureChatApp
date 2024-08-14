@@ -1,282 +1,244 @@
-# Secure Chat Application
+SecureChatApp
 
-This project is a Secure Chat Application developed in Python and Java. The application ensures secure communication using encryption and provides a robust setup process for running on different systems.
+Note: This project can be executed using the provided Python scripts as described below, or alternatively, using the Java version of the project. However, please be aware that the Java version lacks the advanced security features implemented in the Python version.
+
+Overview
+
+SecureChatApp is a Python-based secure chat application that allows multiple clients to communicate securely over a network. The application ensures confidentiality, integrity, and authentication through the use of modern cryptographic techniques, including Elliptic-curve Diffie–Hellman (ECDH) key exchange and AES-GCM encryption.
+Features
+
+    End-to-End Encryption: All messages between clients are encrypted using AES-GCM, ensuring that only intended recipients can read the messages.
+    Secure Key Exchange: The application uses ECDH for secure key exchange, ensuring that shared keys are established securely without being exposed over the network.
+    TLS Communication: Communication between the server and clients is secured using TLS, providing an additional layer of security.
+    Logging: Detailed logging is implemented throughout the application to monitor activities and help in troubleshooting issues.
+    Configurable: The application allows users to configure server and client ports before initiating the chat.
+
+
+
+
+Getting Started
+Prerequisites
+
+    Python 3.6+: Make sure you have Python installed on your machine.
+    Cryptography Library: The application depends on the cryptography library, which can be installed via pip.
+
+#Installation
+
+    #Clone the repository to your local machine:
+
+ 
+
+git clone https://github.com/Jamal-DH/SecureChatApp.git
+cd SecureChatApp
+
+#Install the required Python packages:
+
+
+
+    pip install -r requirements.txt
+
+#Running the Application
+
+   Configure Ports (default values can be changed by user input):
+        
+    server_port = 12345
+    client1_port = 12346
+    client2_port = 12347
+
+Start the Application:
+
+    #Run the main application to start the server and both clients:
+
+        python main.py
+
+    Interact with the Chat Clients:
+        The application will launch a GUI window where you can interact with the chat clients. Type messages and see them encrypted and decrypted in real-time.
+
+Detailed Functionality
+Key Management (key_management.py)
+
+    generate_ecdh_keypair(): Generates a public-private key pair using ECDH on the SECP384R1 curve.
+    derive_shared_key(private_key, peer_public_key_bytes): Derives a shared secret using ECDH and applies HKDF to create a 256-bit shared key.
+
+Encryption (encryption.py)
+
+    encrypt_message(key, plaintext): Encrypts a plaintext message using AES-GCM, producing a base64 encoded string.
+    decrypt_message(key, encrypted_message): Decrypts an AES-GCM encrypted message, returning the original plaintext.
+
+Server (secure_chat_server.py)
+
+    The server listens for incoming client connections, manages key exchanges, and facilitates secure message broadcasting among clients.
+
+Clients (secure_chat_client1.py, secure_chat_client2.py)
+
+    Each client connects to the server, performs key exchange, and allows users to send and receive encrypted messages via a simple GUI.
+
+Logging (logging_config.py, test_logging.py)
+
+    Configures and tests logging, with logs written to both the console and a rotating log file (secure_chat.log).
+
+Input Validation (validation.py)
+
+    Validates user input to ensure only safe and expected data is processed by the application.
+
+Example Usage
+
+    Start the application and interact with two clients communicating through the server. Messages sent by one client will appear on the other client's window, demonstrating end-to-end encryption.
+
+Contributing
+
+Contributions are welcome! Please fork the repository and create a pull request with your changes.
+
+
 
 ## Project Structure
 
 The project directory contains the following structure:
 
+│   .gitattributes
+│   .gitignore
+│   cert.pem
+│   fix.bat
+│   key.pem
+│   README.md
+│   run.bat
+│   selfsigned.crt
+│   selfsigned.key
+│
 ├───.venv
-│   ├───Include
-│   ├───Lib
-│   │   └───site-packages
-│   │       ├───cffi
-│   │       │   └───__pycache__
-│   │       ├───cffi-1.16.0.dist-info
-│   │       ├───cryptography
-│   │       │   ├───hazmat
-│   │       │   │   ├───backends
-│   │       │   │   │   ├───openssl
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───bindings
-│   │       │   │   │   ├───openssl
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   ├───_rust
-│   │       │   │   │   │   └───openssl
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───decrepit
-│   │       │   │   │   ├───ciphers
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───primitives
-│   │       │   │   │   ├───asymmetric
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   ├───ciphers
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   ├───kdf
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   ├───serialization
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   ├───twofactor
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   └───__pycache__
-│   │       │   │   └───__pycache__
-│   │       │   ├───x509
-│   │       │   │   └───__pycache__
-│   │       │   └───__pycache__
-│   │       ├───cryptography-43.0.0.dist-info
-│   │       │   └───license_files
-│   │       ├───pip
-│   │       │   ├───_internal
-│   │       │   │   ├───cli
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───commands
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───distributions
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───index
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───locations
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───metadata
-│   │       │   │   │   ├───importlib
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───models
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───network
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───operations
-│   │       │   │   │   ├───build
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   ├───install
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───req
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───resolution
-│   │       │   │   │   ├───legacy
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   ├───resolvelib
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───utils
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───vcs
-│   │       │   │   │   └───__pycache__
-│   │       │   │   └───__pycache__
-│   │       │   ├───_vendor
-│   │       │   │   ├───cachecontrol
-│   │       │   │   │   ├───caches
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───certifi
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───distlib
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───distro
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───idna
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───msgpack
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───packaging
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───pkg_resources
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───platformdirs
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───pygments
-│   │       │   │   │   ├───filters
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   ├───formatters
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   ├───lexers
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   ├───styles
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───pyproject_hooks
-│   │       │   │   │   ├───_in_process
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───requests
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───resolvelib
-│   │       │   │   │   ├───compat
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───rich
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───tomli
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───truststore
-│   │       │   │   │   └───__pycache__
-│   │       │   │   ├───urllib3
-│   │       │   │   │   ├───contrib
-│   │       │   │   │   │   ├───_securetransport
-│   │       │   │   │   │   │   └───__pycache__
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   ├───packages
-│   │       │   │   │   │   ├───backports
-│   │       │   │   │   │   │   └───__pycache__
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   ├───util
-│   │       │   │   │   │   └───__pycache__
-│   │       │   │   │   └───__pycache__
-│   │       │   │   └───__pycache__
-│   │       │   └───__pycache__
-│   │       ├───pip-24.2.dist-info
-│   │       ├───pycparser
-│   │       │   ├───ply
-│   │       │   │   └───__pycache__
-│   │       │   └───__pycache__
-│   │       └───pycparser-2.22.dist-info
-│   └───Scripts
+│
 ├───python
+│   │   cert.pem
+│   │   config.py # Configuration file for server and client ports
+│   │   key.pem
+│   │   logging_config.py	# Configuration for logging setup
+│   │   main.py		# Main entry point for the application
+│   │   requirements.txt  	# Python dependencies
+│   │   secure_chat_client1.py
+│   │   secure_chat_client2.py
+│   │   secure_chat_server.py
+│   │   selfsigned.crt
+│   │   selfsigned.key
+│   │   test_logging.py
+│   │   validation.py		# Module for validating user input
+│   │   __init__.py
+│   │
 │   ├───logs
+│   │       secure_chat.log
+│   │
 │   ├───security
+│   │   │   encryption.py	# Module for encrypting and decrypting messages
+│   │   │   key_management.py	# Module for ECDH key generation and shared key derivation
+│   │   │   __init__.py
+│   │   │
 │   │   └───__pycache__
+│   │           encryption.cpython-312.pyc
+│   │           key_management.cpython-312.pyc
+│   │           __init__.cpython-312.pyc
+│   │
 │   ├───utils
+│   │   │   input_sanitization.py
+│   │   │   tls_setup.py
+│   │   │   __init__.py
+│   │   │
 │   │   └───__pycache__
+│   │           input_sanitization.cpython-312.pyc
+│   │           tls_setup.cpython-312.pyc
+│   │           __init__.cpython-312.pyc
+│   │
 │   └───__pycache__
+│           logging_config.cpython-312.pyc
+│           main.cpython-312.pyc
+│           validation.cpython-312.pyc
+│           __init__.cpython-312.pyc
+│
 ├───SC_Project
+│   │   build.xml
+│   │   manifest.mf
+│   │   README(Jamal).txt
+│   │
 │   ├───build
+│   │   │   built-jar.properties
+│   │   │
 │   │   ├───classes
+│   │   │   │   .netbeans_automatic_build
+│   │   │   │   .netbeans_update_resources
+│   │   │   │
 │   │   │   ├───C1
+│   │   │   │       C1.class
+│   │   │   │
 │   │   │   ├───C2
+│   │   │   │       C2.class
+│   │   │   │
 │   │   │   ├───Enc
+│   │   │   │       CryptoUtils.class
+│   │   │   │
 │   │   │   ├───passwordutil
+│   │   │   │       PasswordUtil.class
+│   │   │   │
 │   │   │   ├───S1
+│   │   │   │       S1$1.class
+│   │   │   │       S1$ClientHandler.class
+│   │   │   │       S1$PasswordPanel$1.class
+│   │   │   │       S1$PasswordPanel.class
+│   │   │   │       S1.class
+│   │   │   │
 │   │   │   ├───sc_project
+│   │   │   │       SC_Project.class
+│   │   │   │
 │   │   │   ├───SecureC1
 │   │   │   └───SecureC2
+│   │   │           SecureC2.class
+│   │   │
 │   │   ├───empty
 │   │   └───generated-sources
 │   │       └───ap-source-output
 │   ├───dist
+│   │   │   README.TXT
+│   │   │   SC_Project.jar
+│   │   │
 │   │   └───lib
+│   │           jbcrypt-0.4.jar
+│   │
 │   ├───nbproject
+│   │   │   build-impl.xml
+│   │   │   genfiles.properties
+│   │   │   project.properties
+│   │   │   project.xml
+│   │   │
 │   │   └───private
+│   │           config.properties
+│   │           private.properties
+│   │           private.xml
+│   │
 │   ├───src
 │   │   ├───C1
+│   │   │       C1.java
+│   │   │
 │   │   ├───C2
+│   │   │       C2.java
+│   │   │
 │   │   ├───Enc
+│   │   │       CryptoUtils.java
+│   │   │
 │   │   ├───passwordutil
+│   │   │       PasswordUtil.java
+│   │   │
 │   │   ├───S1
+│   │   │       S1.java
+│   │   │
 │   │   ├───sc_project
+│   │   │       SC_Project.java
+│   │   │
 │   │   ├───SecureC1
+│   │   │       SecureC1.java
+│   │   │
 │   │   └───SecureC2
+│   │           SecureC2.java
+│   │
 │   └───test
 └───ssl
     └───OpenSSL-Win64
-        ├───bin
-        │   ├───cnf
-        │   └───PEM
-        │       └───demoSRP
-        ├───exp
-        ├───include
-        │   └───openssl
-        ├───lib
-        │   └───VC
-        │       └───x64
-        │           ├───MD
-        │           ├───MDd
-        │           ├───MT
-        │           └───MTd
-        └───tests
-            ├───certs
-            ├───ct
-            ├───d2i-tests
-            ├───fuzz
-            ├───ocsp-tests
-            ├───recipes
-            │   ├───04-test_asn1_stable_parse_data
-            │   ├───04-test_conf_data
-            │   ├───04-test_params_conversion_data
-            │   ├───04-test_pem_reading_data
-            │   ├───04-test_pem_read_depr_data
-            │   ├───10-test_bn_data
-            │   ├───15-test_dsaparam_data
-            │   │   ├───invalid
-            │   │   └───valid
-            │   ├───15-test_ecparam_data
-            │   │   ├───invalid
-            │   │   ├───noncanon
-            │   │   └───valid
-            │   ├───15-test_mp_rsa_data
-            │   ├───15-test_rsapss_data
-            │   ├───20-test_dhparam_check_data
-            │   │   ├───invalid
-            │   │   └───valid
-            │   ├───20-test_dhparam_data
-            │   ├───25-test_eai_data
-            │   ├───25-test_pkcs7_data
-            │   ├───25-test_rusext_data
-            │   ├───30-test_defltfips
-            │   ├───30-test_evp_data
-            │   ├───30-test_evp_pkey_provided
-            │   ├───30-test_pairwise_fail_data
-            │   ├───61-test_bio_prefix_data
-            │   ├───65-test_cmp_client_data
-            │   ├───65-test_cmp_msg_data
-            │   ├───65-test_cmp_protect_data
-            │   ├───65-test_cmp_server_data
-            │   ├───65-test_cmp_vfy_data
-            │   ├───66-test_ossl_store_data
-            │   ├───70-test_quic_multistream_data
-            │   ├───75-test_quicapi_data
-            │   ├───80-test_ca_data
-            │   ├───80-test_ca_internals_data
-            │   ├───80-test_cmp_http_data
-            │   │   └───Mock
-            │   ├───80-test_cmsapi_data
-            │   ├───80-test_cms_data
-            │   ├───80-test_ocsp_data
-            │   ├───80-test_pkcs12_data
-            │   ├───80-test_policy_tree_data
-            │   ├───80-test_ssl_old_data
-            │   ├───80-test_tsa_data
-            │   ├───90-test_gost_data
-            │   ├───90-test_includes_data
-            │   │   ├───conf-includes
-            │   │   └───conf-includes-prov
-            │   ├───90-test_sslapi_data
-            │   ├───90-test_store_cases_data
-            │   ├───90-test_store_data
-            │   ├───90-test_threads_data
-            │   ├───91-test_pkey_check_data
-            │   ├───95-test_external_cf_quiche_data
-            │   ├───95-test_external_gost_engine_data
-            │   ├───95-test_external_krb5_data
-            │   ├───95-test_external_oqsprovider_data
-            │   ├───95-test_external_pyca_data
-            │   └───95-test_external_tlsfuzzer_data
-            ├───smime-certs
-            ├───smime-eml
-            └───ssl-tests
-
 
 
 ## Setup and Running the Project
