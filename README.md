@@ -24,12 +24,12 @@ Prerequisites
 
 #Installation
 
-    #Clone the repository to your local machine:
+Clone the repository to your local machine:
 
- 
+     git clone https://github.com/Jamal-DH/SecureChatApp.git
+     cd SecureChatApp
 
-git clone https://github.com/Jamal-DH/SecureChatApp.git
-cd SecureChatApp
+
 
 #Install the required Python packages:
 
