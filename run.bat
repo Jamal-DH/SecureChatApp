@@ -17,30 +17,17 @@ REM Activate virtual environment
 echo Activating virtual environment...
 call %VENV_SCRIPTS%\activate
 
-REM Install requirements
-echo Installing requirements...
+REM Upgrade pip
+echo Upgrading pip...
 %PYTHON_EXEC% -m pip install --upgrade pip
-%PYTHON_EXEC% -m pip install -r "%PROJECT_DIR%python\requirements.txt"
+
+REM Install and upgrade all dependencies to the latest version
+echo Upgrading all dependencies to the latest version...
+%PYTHON_EXEC% -m pip install --upgrade -r "%PROJECT_DIR%python\requirements.txt"
 
 REM Set environment variables
 echo Setting environment variables...
 SET PATH=%PROJECT_DIR%\ssl\OpenSSL-Win64\bin;%PATH%
-
-REM Print skeleton with red color using PowerShell
-powershell -command "Write-Host '                     ______' -ForegroundColor Red"
-powershell -command "Write-Host '                  .-\"      \"-.' -ForegroundColor Red"
-powershell -command "Write-Host '                 /            \' -ForegroundColor Red"
-powershell -command "Write-Host '                |              |' -ForegroundColor Red"
-powershell -command "Write-Host '                |,  .-.  .-.  ,|' -ForegroundColor Red"
-powershell -command "Write-Host '                | )(_o/  \o_)( |' -ForegroundColor Red"
-powershell -command "Write-Host '                |/     /\     \|' -ForegroundColor Red"
-powershell -command "Write-Host '      (@_       (_     ^^     _)' -ForegroundColor Red"
-powershell -command "Write-Host ' _     ) \_______\__|IIIIII|__/_____________________________' -ForegroundColor Red"
-powershell -command "Write-Host '(_)XXX{} <________|-\IIIIII/-|_______________________________>' -ForegroundColor Red"
-powershell -command "Write-Host '       )_/        \          /' -ForegroundColor Red"
-powershell -command "Write-Host '      (@           `--------`' -ForegroundColor Red"
-
-powershell -command "Write-Host '                     Jimmie   '-ForegroundColor Red"
 
 REM Run the program
 echo Running the program...
