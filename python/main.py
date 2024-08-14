@@ -9,8 +9,19 @@ import sys
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from logging_config import setup_logging
-from validation import validate_input
-from utils.input_sanitization import sanitize_input
+
+# Input sanitization function
+def sanitize_input(input_str):
+    sanitized = input_str.strip()
+    return sanitized if sanitized.isdigit() else ''
+
+# Input validation function
+def validate_input(port_str):
+    try:
+        port = int(port_str)
+        return 1024 <= port <= 65535
+    except ValueError:
+        return False
 
 # Setup logging
 logger = setup_logging()
@@ -48,18 +59,41 @@ class ConfigWindow:
 
     def start_application(self):
         logger.debug("Start button clicked")
-        server_port = sanitize_input(self.entryPort.get())
-        client1_port = sanitize_input(self.entryClient1Port.get())
-        client2_port = sanitize_input(self.entryClient2Port.get())
-
-        # Validate input
-        if validate_input(server_port) and validate_input(client1_port) and validate_input(client2_port):
-            logger.debug(f"Valid ports: server={server_port}, client1={client1_port}, client2={client2_port}")
-            threading.Thread(target=self.run_chat_application, args=(server_port, client1_port, client2_port)).start()
-            self.master.destroy()
-        else:
-            messagebox.showerror("Input Error", "Please enter valid ports.")
-            logger.error("Invalid input ports provided")
+        
+        # Sanitize inputs
+        server_port_input = self.entryPort.get()
+        client1_port_input = self.entryClient1Port.get()
+        client2_port_input = self.entryClient2Port.get()
+        
+        server_port = sanitize_input(server_port_input)
+        client1_port = sanitize_input(client1_port_input)
+        client2_port = sanitize_input(client2_port_input)
+        
+        # Check for empty or non-numeric inputs
+        if not server_port or not client1_port or not client2_port:
+            messagebox.showerror("Input Error", "All ports must be numeric and non-empty.")
+            logger.error("Sanitization failed: Non-numeric or empty port values provided")
+            return
+        
+        # Validate port ranges
+        invalid_ports = []
+        if not validate_input(server_port):
+            invalid_ports.append(f"Server Port ({server_port_input})")
+        if not validate_input(client1_port):
+            invalid_ports.append(f"Client 1 Port ({client1_port_input})")
+        if not validate_input(client2_port):
+            invalid_ports.append(f"Client 2 Port ({client2_port_input})")
+        
+        if invalid_ports:
+            invalid_ports_str = ', '.join(invalid_ports)
+            messagebox.showerror("Input Error", f"The following ports are invalid or out of range (1024-65535): {invalid_ports_str}.")
+            logger.error(f"Invalid port values provided: {invalid_ports_str}")
+            return
+        
+        # If all validations pass, proceed to start the application
+        logger.debug(f"Valid ports: server={server_port}, client1={client1_port}, client2={client2_port}")
+        threading.Thread(target=self.run_chat_application, args=(server_port, client1_port, client2_port)).start()
+        self.master.destroy()
 
     def run_chat_application(self, server_port, client1_port, client2_port):
         base_path = os.path.abspath(os.path.dirname(__file__))

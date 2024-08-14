@@ -266,7 +266,7 @@ Log files are generated and stored in the logs directory to keep track of the ap
 Dependencies
 The requirements.txt file contains the Python dependencies required for the project:
 
-cryptography   
+        cryptography   
 
 Acknowledgements
 Thanks to the contributors of the cryptography library.
