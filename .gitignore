@@ -1,0 +1,15 @@
+# Ignore Python virtual environment
+venv/
+*.pyc
+__pycache__/
+
+# Ignore Java compiled files
+*.class
+*.jar
+
+# Ignore log files
+*.log
+
+# Ignore other system files
+.DS_Store
+Thumbs.db
