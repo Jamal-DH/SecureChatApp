@@ -7,16 +7,18 @@ Overview
 SecureChatApp is a Python-based secure chat application that allows multiple clients to communicate securely over a network. The application ensures confidentiality, integrity, and authentication through the use of modern cryptographic techniques, including Elliptic-curve Diffie–Hellman (ECDH) key exchange and AES-GCM encryption.
 Features
 
-    End-to-End Encryption: All messages between clients are encrypted using AES-GCM, ensuring that only intended recipients can read the messages.
-    Secure Key Exchange: The application uses ECDH for secure key exchange, ensuring that shared keys are established securely without being exposed over the network.
-    TLS Communication: Communication between the server and clients is secured using TLS, providing an additional layer of security.
-    Logging: Detailed logging is implemented throughout the application to monitor activities and help in troubleshooting issues.
-    Configurable: The application allows users to configure server and client ports before initiating the chat.
+End-to-End Encryption: All messages between clients are encrypted using AES-GCM, ensuring that only intended recipients can read the messages.
+Secure Key Exchange: The application uses ECDH for secure key exchange, ensuring that shared keys are established securely without being exposed over the network.
+
+TLS Communication: Communication between the server and clients is secured using TLS, providing an additional layer of security.
+Logging: Detailed logging is implemented throughout the application to monitor activities and help in troubleshooting issues.
+Configurable: The application allows users to configure server and client ports before initiating the chat.
 
 
 
 
 Getting Started
+
 Prerequisites
 
     Python 3.6+: Make sure you have Python installed on your machine.
@@ -51,8 +53,8 @@ Start the Application:
 
         python main.py
 
-    Interact with the Chat Clients:
-        The application will launch a GUI window where you can interact with the chat clients. Type messages and see them encrypted and decrypted in real-time.
+Interact with the Chat Clients:
+   The application will launch a GUI window where you can interact with the chat clients. Type messages and see them encrypted and decrypted in real-time.
 
 Detailed Functionality
 Key Management (key_management.py)
