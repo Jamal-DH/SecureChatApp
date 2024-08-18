@@ -4,15 +4,37 @@ Note: This project can be executed using the provided Python scripts as describe
 
 Overview
 
-SecureChatApp is a Python-based secure chat application that allows multiple clients to communicate securely over a network. The application ensures confidentiality, integrity, and authentication through the use of modern cryptographic techniques, including Elliptic-curve Diffie–Hellman (ECDH) key exchange and AES-GCM encryption.
-Features
+SecureChatApp is a Python-based secure chat application designed to enable multiple clients to communicate securely over a network. The application prioritizes confidentiality, integrity, and authentication by employing advanced cryptographic techniques, including Elliptic-curve Diffie–Hellman (ECDH) key exchange and AES-GCM encryption.
 
-End-to-End Encryption: All messages between clients are encrypted using AES-GCM, ensuring that only intended recipients can read the messages.
-Secure Key Exchange: The application uses ECDH for secure key exchange, ensuring that shared keys are established securely without being exposed over the network.
 
-TLS Communication: Communication between the server and clients is secured using TLS, providing an additional layer of security.
-Logging: Detailed logging is implemented throughout the application to monitor activities and help in troubleshooting issues.
-Configurable: The application allows users to configure server and client ports before initiating the chat.
+Features: 
+
+
+End-to-End Encryption: All messages between clients are encrypted using AES-GCM, a robust encryption mode that provides both confidentiality and data integrity. This ensures that only the intended recipients can decrypt and read the messages, with the integrity of the message verified automatically.
+
+
+AES-256 Encryption: The application uses AES encryption with a 256-bit key length, offering a high level of security suitable for protecting sensitive communications.
+
+
+Secure Key Exchange: SecureChatApp utilizes the Elliptic-curve Diffie–Hellman (ECDH) protocol for secure key exchange. This method allows the creation of a shared secret between two parties over an insecure channel, without exposing the shared key to potential attackers.
+
+
+TLS Communication: The communication between the server and clients is further secured using Transport Layer Security (TLS). This adds an additional layer of protection against man-in-the-middle attacks by ensuring that the data transmitted over the network is encrypted and secure.
+
+
+Robust Key Management: The application includes a comprehensive key management system, which involves generating ECDH key pairs, deriving shared keys using the HKDF function with SHA-256, and securely managing keys throughout the communication process.
+
+
+Secure Random Initialization Vectors (IVs): AES-GCM encryption in SecureChatApp employs cryptographically secure random Initialization Vectors (IVs) generated using os.urandom(). This ensures that the same plaintext encrypted multiple times will yield different ciphertexts, enhancing security.
+
+
+Logging: Detailed logging is implemented throughout the application to monitor activities, including successful and failed encryption/decryption events, key generation, and shared key derivation. This logging is crucial for troubleshooting and maintaining a secure environment.
+
+
+Error Handling: The application includes robust error handling mechanisms, particularly during the decryption process. It logs detailed error messages for issues such as invalid authentication tags, general decryption failures, and key management errors, ensuring that potential security issues are identified and addressed.
+
+
+Configurable Ports: Users have the ability to configure server and client ports before initiating the chat. This flexibility allows for custom network setups and can help in avoiding port conflicts with other applications.
 
 
 
