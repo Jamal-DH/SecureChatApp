@@ -59,6 +59,9 @@ def handle_client(client_socket, client_id):
         client_keys[client_socket] = shared_key
         clients[client_socket] = client_id
 
+        # Log the derived shared key for troubleshooting
+        logger.info(f"Derived shared key for client {client_id}: {shared_key.hex()}")
+
         while True:
             encrypted_message = client_socket.recv(4096).decode('utf-8')
             if not encrypted_message:

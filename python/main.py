@@ -30,7 +30,7 @@ class ConfigWindow:
     def __init__(self, master):
         self.master = master
         self.master.title("Secure Chat Configuration")
-        self.master.geometry("400x400")
+        self.master.geometry("450x480+760+340")
         self.master.configure(bg="#1a1a1a")
 
         self.labelTitle = Label(master, text="Secure Chat Configuration", font=("Courier New", 18, "bold"), bg="#1a1a1a", fg="#00FF00")
