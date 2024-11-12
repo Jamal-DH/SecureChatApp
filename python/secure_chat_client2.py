@@ -10,7 +10,6 @@ import sys
 import ssl
 import paramiko
 import time
-import os
 from cryptography.hazmat.primitives import serialization
 from security.encryption import encrypt_message, decrypt_message
 from security.key_management import generate_ecdh_keypair, derive_shared_key
@@ -57,20 +56,41 @@ class ChatClient:
         self.auth_frame = ctk.CTkFrame(self.master, fg_color="#252525")
         self.auth_frame.pack(fill="both", expand=True)
 
-        self.error_label = ctk.CTkLabel(self.auth_frame, text="ERROR: Authentication Failed",
-                                        font=("Segoe UI", 22, "bold"), fg_color="#252525", text_color="red")
+        self.error_label = ctk.CTkLabel(
+            self.auth_frame,
+            text="ERROR: Authentication Failed",
+            font=("Segoe UI", 22, "bold"),
+            fg_color="#252525",
+            text_color="red"
+        )
         self.error_label.pack(pady=(10, 0))
 
-        self.auth_label = ctk.CTkLabel(self.auth_frame,
-                                       text="USB Not Detected or Authentication Failed. Please Insert Your USB and Click 'Try Again'.",
-                                       font=("Segoe UI", 19), fg_color="#252525", text_color="white", wraplength=430)
+        self.auth_label = ctk.CTkLabel(
+            self.auth_frame,
+            text="USB Not Detected or Authentication Failed. Please Insert Your USB and Click 'Try Again'.",
+            font=("Segoe UI", 19),
+            fg_color="#252525",
+            text_color="white",
+            wraplength=430
+        )
         self.auth_label.pack(pady=10)
 
-        self.try_again_button = ctk.CTkButton(self.auth_frame, text="Try Again", command=self.try_authenticate,
-                                              font=("Segoe UI Bold", 13), fg_color="#255325", text_color="white")
+        self.try_again_button = ctk.CTkButton(
+            self.auth_frame,
+            text="Try Again",
+            command=self.try_authenticate,
+            font=("Segoe UI Bold", 13),
+            fg_color="#255325",
+            text_color="white"
+        )
         self.try_again_button.pack(pady=20)
 
-        self.auth_attempts_label = ctk.CTkLabel(self.auth_frame, text="", fg_color="#252525", text_color="red")
+        self.auth_attempts_label = ctk.CTkLabel(
+            self.auth_frame,
+            text="",
+            fg_color="#252525",
+            text_color="red"
+        )
         self.auth_attempts_label.pack(pady=5)
 
         # Perform an initial authentication attempt
@@ -83,7 +103,8 @@ class ChatClient:
                 self.start_chat_client()
             else:
                 self.auth_label.configure(
-                    text="USB not detected or authentication failed. Please insert your USB and click 'Try Again'.")
+                    text="USB not detected or authentication failed. Please insert your USB and click 'Try Again'."
+                )
         except Exception as e:
             messagebox.showerror("Authentication Error", f"An error occurred during initial authentication: {e}")
 
@@ -93,8 +114,10 @@ class ChatClient:
         # Check if lockout period is active
         if lockout_time > 0 and time.time() < lockout_time:
             remaining_time = int(lockout_time - time.time())
-            messagebox.showwarning("Authentication Locked",
-                                   f"Too many failed attempts. Please try again in {remaining_time // 60} minutes and {remaining_time % 60} seconds.")
+            messagebox.showwarning(
+                "Authentication Locked",
+                f"Too many failed attempts. Please try again in {remaining_time // 60} minutes and {remaining_time % 60} seconds."
+            )
             return
 
         try:
@@ -106,16 +129,26 @@ class ChatClient:
                 remaining_attempts = max(0, MAX_ATTEMPTS - failed_attempts)
                 self.auth_attempts_label.configure(text=f"Authentication failed. Attempts left: {remaining_attempts}")
 
-                if failed_attempts >= MAX_ATTEMPTS:
+                if remaining_attempts > 0:
+                    messagebox.showerror(
+                        "Authentication Failed",
+                        f"Invalid USB authentication data. Attempts remaining: {remaining_attempts}."
+                    )
+                else:
+                    # Disable the "Try Again" button when max attempts are reached
+                    self.try_again_button.configure(state="disabled")
+
                     lockout_time = time.time() + LOCKOUT_DURATION
-                    messagebox.showerror("Authentication Locked",
-                                         f"Too many failed attempts. Locked out for {LOCKOUT_DURATION // 60} minutes.")
+                    messagebox.showerror(
+                        "Authentication Locked",
+                        f"Too many failed attempts. Locked out for {LOCKOUT_DURATION // 60} minutes."
+                    )
 
                     system_info = get_system_info()
                     subject = "USB Authentication Failed"
-                    body = format_email_body(system_info, MAX_ATTEMPTS)
-                    to_email = "your_alert_email@example.com"
-                    send_email_alert(subject, body, to_email)
+                    email_body, logo_data = format_email_body(system_info, MAX_ATTEMPTS)
+                    to_email = "jzororonoro@gmail.com"
+                    send_email_alert(subject, email_body, to_email, logo_data)
 
                     failed_attempts = 0  # Reset the counter after locking out
         except FileNotFoundError as e:
@@ -171,6 +204,7 @@ class ChatClient:
 
     def create_menu_bar(self):
         menubar = Menu(self.master, tearoff=0)
+
         tools_menu = Menu(menubar, tearoff=0)
         tools_menu.add_command(label="Encrypt/Decrypt", command=self.open_encryption_tool)
         tools_menu.add_command(label="Send File", command=self.open_file_transfer_dialog)
@@ -184,10 +218,11 @@ class ChatClient:
         help_menu = Menu(menubar, tearoff=0)
         help_menu.add_command(label="About", command=self.show_about_info)
         menubar.add_cascade(label="Help", menu=help_menu)
+
         self.master.config(menu=menubar)
 
     def show_about_info(self):
-        messagebox.showinfo("About", "Advanced Secure Chat Client\nVersion 1.0 \n \nDeveloped by: JAMAL_DH")
+        messagebox.showinfo("About", "Advanced Secure Chat Client\nVersion 1.0\n\nDeveloped by: JAMAL_DH")
 
     def open_encryption_tool(self):
         main_screen()
@@ -263,8 +298,12 @@ class ChatClient:
                 self.ssh_client = paramiko.SSHClient()
                 self.ssh_client.load_system_host_keys()
                 self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                self.ssh_client.connect(self.host, port=22, username=os.getenv('SSH_USERNAME'),
-                                        password=os.getenv('SSH_PASSWORD'))  # Use environment variables for credentials
+                self.ssh_client.connect(
+                    self.host,
+                    port=22,
+                    username=os.getenv('SSH_USERNAME'),
+                    password=os.getenv('SSH_PASSWORD')  # Use environment variables for credentials
+                )
                 logging.info("SSH connection established.")
             except paramiko.AuthenticationException as auth_error:
                 logging.error(f"Authentication failed: {auth_error}")
@@ -275,24 +314,51 @@ class ChatClient:
                 self.ssh_client = None
 
     def create_widgets(self):
-        self.labelHead = ctk.CTkLabel(self.master, text=f"Secure Chat Client {self.client_id}",
-                                      font=("Courier New", 20, "bold"), fg_color="#1a1a1a", text_color="#5F87AF")
+        self.labelHead = ctk.CTkLabel(
+            self.master,
+            text=f"Secure Chat Client {self.client_id}",
+            font=("Courier New", 20, "bold"),
+            fg_color="#1a1a1a",
+            text_color="#5F87AF"
+        )
         self.labelHead.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky="nsew")
 
-        self.textbox_border_frame = ctk.CTkFrame(self.master, fg_color="#3A506B", corner_radius=0, border_width=1)
+        self.textbox_border_frame = ctk.CTkFrame(
+            self.master,
+            fg_color="#3A506B",
+            corner_radius=0,
+            border_width=1
+        )
         self.textbox_border_frame.grid(row=1, column=0, columnspan=2, padx=5, pady=5, sticky="nsew")
 
-        self.textCons = ctk.CTkTextbox(self.textbox_border_frame, fg_color="#1a1a1a", text_color="#00FF00",
-                                       font=("Courier New", 18), padx=5, pady=5)
+        self.textCons = ctk.CTkTextbox(
+            self.textbox_border_frame,
+            fg_color="#1a1a1a",
+            text_color="#00FF00",
+            font=("Courier New", 18),
+            padx=5,
+            pady=5
+        )
         self.textCons.pack(fill="both", expand=True, padx=5, pady=5)
         self.textCons.configure(state="disabled")
 
-        self.entryMsg = ctk.CTkEntry(self.master, fg_color="#262626", text_color="#00FF00", font=("Helvetica", 18))
+        self.entryMsg = ctk.CTkEntry(
+            self.master,
+            fg_color="#262626",
+            text_color="#00FF00",
+            font=("Helvetica", 18)
+        )
         self.entryMsg.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
         self.entryMsg.focus()
 
-        self.buttonMsg = ctk.CTkButton(self.master, text="Send", font=("Courier New", 12, "bold"),
-                                       fg_color="#8A9BA8", text_color="#1a1a1a", command=self.send_message)
+        self.buttonMsg = ctk.CTkButton(
+            self.master,
+            text="Send",
+            font=("Courier New", 12, "bold"),
+            fg_color="#8A9BA8",
+            text_color="#1a1a1a",
+            command=self.send_message
+        )
         self.buttonMsg.grid(row=2, column=1, padx=10, pady=10, sticky="ew")
 
         self.master.grid_rowconfigure(1, weight=1)

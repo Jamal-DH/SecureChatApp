@@ -1,4 +1,4 @@
-from tkinter import *
+import customtkinter as ctk
 from tkinter import messagebox
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -9,6 +9,10 @@ import os
 # Constants
 SALT_LENGTH = 16
 IV_LENGTH = 16
+
+# Set the appearance and color theme
+ctk.set_appearance_mode("dark")  # Options: "dark", "light", "system"
+ctk.set_default_color_theme("dark-blue")  # Options: "blue", "green", "dark-blue"
 
 # Encryption and decryption functions using AES
 def generate_key(password, salt):
@@ -38,30 +42,47 @@ def decrypt_message(encrypted_message, key):
     return plaintext.decode()
 
 def show_output_window(output_text):
-    output_window = Toplevel()
+    output_window = ctk.CTkToplevel()
     output_window.title("Output")
-    output_window.geometry("400x200")
+    output_window.geometry("500x400")
+    output_window.configure(fg_color="#1a1a1a")
 
-    frame = Frame(output_window)
-    frame.pack(pady=5)
+    frame = ctk.CTkFrame(output_window, fg_color="#1a1a1a")
+    frame.pack(pady=10)
 
-    Label(frame, text="Here is your output:", font=("Segoe UI", 13)).pack(side=LEFT, padx=(0, 10))
+    ctk.CTkLabel(
+        frame,
+        text="Here is your output:",
+        text_color="#00FF00",
+        font=("Courier New", 15)
+    ).pack(side="left", padx=(0, 10))
 
     def copy_to_clipboard():
         output_window.clipboard_clear()
         output_window.clipboard_append(output_text)
         messagebox.showinfo("Copied", "Text copied to clipboard!")
 
-    copy_button = Button(frame, text="Copy",  bd=0, bg="#0D47A1", fg="white", height="1", width=6, command=copy_to_clipboard)
-    copy_button.pack(side=LEFT)
+    copy_button = ctk.CTkButton(
+        frame,
+        text="Copy",
+        font=("Courier New", 15),
+        fg_color="#00FF00",
+        text_color="#1a1a1a",
+        command=copy_to_clipboard
+    )
+    copy_button.pack(side="left")
 
-    output_textbox = Text(output_window, font="Robote 12", bg="white", wrap=WORD, bd=0)
-    output_textbox.pack(pady=10, padx=10, expand=True, fill=BOTH)
+    output_textbox = ctk.CTkTextbox(
+        output_window,
+        font=("Courier New", 15),
+        fg_color="#1a1a1a",
+        text_color="#00FF00",
+        wrap="word"
+    )
+    output_textbox.pack(pady=10, padx=10, expand=True, fill="both")
 
-    output_textbox.insert(END, output_text)
-    output_textbox.config(state=DISABLED)  # Disable editing
-    output_textbox.bind("<Control-c>", lambda e: None)  # Allow copying
-    output_textbox.bind("<Control-C>", lambda e: None)  # Allow copying
+    output_textbox.insert("end", output_text)
+    output_textbox.configure(state="disabled")  # Disable editing
 
 def encrypt():
     password = code.get()
@@ -69,7 +90,7 @@ def encrypt():
         messagebox.showerror("Error", "Please enter a secret key for encryption.")
         return
 
-    text_to_encrypt = text1.get("1.0", END).strip()
+    text_to_encrypt = text1.get("1.0", "end").strip()
     if not text_to_encrypt:
         messagebox.showerror("Error", "Please enter text to encrypt.")
         return
@@ -84,7 +105,7 @@ def encrypt():
     update_button_states(is_encrypted=True)
 
 def decrypt():
-    encrypted_message = text1.get("1.0", END).strip()
+    encrypted_message = text1.get("1.0", "end").strip()
     if not encrypted_message:
         messagebox.showerror("Error", "Please enter an encrypted message for decryption.")
         return
@@ -115,53 +136,116 @@ def decrypt():
 
 def reset():
     code.set("")
-    text1.delete("1.0", END)
+    text1.delete("1.0", "end")
     update_button_states(is_encrypted=False)
 
-def check_text():
-    if text1.get("1.0", END).strip():
-        encrypt_button.config(state="normal")
-        decrypt_button.config(state="normal")
+def check_text(event=None):
+    if text1.get("1.0", "end").strip():
+        encrypt_button.configure(state="normal")
+        decrypt_button.configure(state="normal")
     else:
-        encrypt_button.config(state="disabled")
-        decrypt_button.config(state="disabled")
+        encrypt_button.configure(state="disabled")
+        decrypt_button.configure(state="disabled")
 
 def update_button_states(is_encrypted):
     if is_encrypted:
-        encrypt_button.config(state="disabled")
-        decrypt_button.config(state="normal")
+        encrypt_button.configure(state="disabled")
+        decrypt_button.configure(state="normal")
     else:
-        encrypt_button.config(state="normal")
-        decrypt_button.config(state="disabled")
+        encrypt_button.configure(state="normal")
+        decrypt_button.configure(state="disabled")
 
 def main_screen():
-   
-    screen = Toplevel()
-    screen.geometry("375x398")
-    screen.title("ENCRYPTOR")
+    screen = ctk.CTkToplevel()
+    screen.geometry("520x450")
+    screen.title("Encryptor")
+    screen.configure(fg_color="#1a1a1a")
 
-    Label(screen, text="Enter text for encryption and decryption", fg="black", font=("Segoe UI", 13)).place(x=10, y=10)
+    # Title Label
+    ctk.CTkLabel(
+        screen,
+        text="Enter text for encryption and decryption",
+        text_color="#00FF00",
+        font=("Courier New", 18)
+    ).pack(pady=(10, 5))
 
+    # Text Input
     global text1
-    text1 = Text(screen, font="Robote 20", bg="white", relief=GROOVE, wrap=WORD, bd=0)
-    text1.place(x=10, y=50, height=100, width=355)
-    text1.bind("<KeyRelease>", lambda event: check_text())
+    text1 = ctk.CTkTextbox(
+        screen,
+        font=("Courier New", 14),
+        fg_color="#1a1a1a",
+        text_color="#00FF00",
+        wrap="word",
+        height=100
+    )
+    text1.pack(pady=5, padx=10, fill="both")
+    text1.bind("<KeyRelease>", check_text)
 
-    Label(screen, text="Enter secret key for encryption and decryption", fg="black", font=("Segoe UI", 13)).place(x=10, y=170)
+    # Secret Key Label
+    ctk.CTkLabel(
+        screen,
+        text="Enter secret key for encryption and decryption",
+        text_color="#00FF00",
+        font=("Courier New", 18)
+    ).pack(pady=(10, 5))
 
+    # Secret Key Entry
     global code, encrypt_button, decrypt_button
-    code = StringVar()
-    Entry(screen, textvariable=code, font="Robote 20", bg="white", width=19, bd=0, show="*").place(x=10, y=200, height=48, width=355)
+    code = ctk.StringVar()
+    entry_code = ctk.CTkEntry(
+        screen,
+        textvariable=code,
+        font=("Courier New", 14),
+        fg_color="#262626",
+        text_color="#00FF00",
+        show="*"
+    )
+    entry_code.pack(pady=5, padx=10, fill="x")
 
-    encrypt_button = Button(screen, text="ENCRYPT", bd=0, bg="#0D47A1", fg="white", height="2", width=23, command=encrypt)
-    encrypt_button.place(x=10, y=250)
-    encrypt_button.config(state="normal")
+    # Buttons Frame
+    buttons_frame = ctk.CTkFrame(screen, fg_color="#1a1a1a")
+    buttons_frame.pack(pady=10)
 
-    decrypt_button = Button(screen, text="DECRYPT", bd=0, bg="#0D47A1", fg="white", height="2", width=23, command=decrypt)
-    decrypt_button.place(x=200, y=250)
-    decrypt_button.config(state="normal")
+    encrypt_button = ctk.CTkButton(
+        buttons_frame,
+        text="ENCRYPT",
+        font=("Courier New", 14),
+        fg_color="#3A506B",
+        text_color="#1a1a1a",
+        command=encrypt,
+        width=100
+    )
+    encrypt_button.pack(side="left", padx=5)
+    encrypt_button.configure(state="normal")
 
-    Button(screen, text="RESET", bd=0, bg="#00bd56", fg="white", height="2", width=50, command=reset).place(x=10, y=300)
+    decrypt_button = ctk.CTkButton(
+        buttons_frame,
+        text="DECRYPT",
+        font=("Courier New", 14),
+        fg_color="#3A506B",
+        text_color="#1a1a1a",
+        command=decrypt,
+        width=100
+    )
+    decrypt_button.pack(side="left", padx=5)
+    decrypt_button.configure(state="normal")
 
-    
+    reset_button = ctk.CTkButton(
+        buttons_frame,
+        text="RESET",
+        font=("Courier New", 14),
+        fg_color="#350606",
+        text_color="#1a1a1a",
+        command=reset,
+        width=100
+    )
+    reset_button.pack(side="left", padx=5)
+
     screen.focus()
+
+# Uncomment the following lines to run the application independently
+# if __name__ == "__main__":
+#     root = ctk.CTk()
+#     main_screen()
+#     root.mainloop()
