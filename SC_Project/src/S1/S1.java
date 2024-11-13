@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.*;
+import java.security.CodeSource;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -376,7 +377,6 @@ public class S1 extends JFrame {
             gbc.weighty = 0.5;
             add(Box.createVerticalStrut(10), gbc);
 
-
             JButton confirmButton = new JButton("Confirm") {
                 @Override
                 protected void paintComponent(Graphics g) {
@@ -446,29 +446,42 @@ public class S1 extends JFrame {
     }
 
     private void startPythonChatApp() {
-        try {
-            // Provide the full path to the batch file
-            String batchFile = "C:\\Users\\RTX\\Desktop\\twst\\run.bat";
+    try {
+        // Get the path to the directory where the .jar file is located
+        CodeSource codeSource = getClass().getProtectionDomain().getCodeSource();
+        File jarFile = new File(codeSource.getLocation().toURI());
+        File jarDir = jarFile.getParentFile(); // This should be the 'dist' directory
 
-            // Build the command to execute the batch file in a new command prompt window
-            ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "start", batchFile);
+        // Navigate up to the project root directory
+        File projectDir = jarDir.getParentFile().getParentFile(); // Adjust the number of getParentFile() calls as needed
+        String projectDirPath = projectDir.getAbsolutePath();
 
-            // Set the working directory (optional, if needed by the batch file)
-            pb.directory(new java.io.File("C:\\Users\\RTX\\Desktop\\twst"));
+        // Debug output
+        System.out.println("Project directory: " + projectDirPath); 
 
-            // Set environment variables (if any are needed)
-            Map<String, String> env = pb.environment();
-            // env.put("ENV_VAR_NAME", "value"); // Uncomment and set as needed
+        // Path to the batch file in the root directory
+        String batchFile = projectDirPath + File.separator + "run.bat";
 
-            // Start the batch file
-            pb.start();
+        // Debug output
+        System.out.println("Batch file path: " + batchFile);
 
-            // Exit the Java application immediately
-            System.exit(0);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        // Build the command to execute the batch file
+        ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "start", "\"\"", batchFile);
+
+        // Set the working directory to the project root directory
+        pb.directory(projectDir);
+
+        // Start the batch file
+        pb.start();
+
+        // Exit the Java application
+        System.exit(0);
+    } catch (Exception ex) {
+        ex.printStackTrace();
     }
+}
+
+
 
     public void showMessage(String message) {
         Frame parentFrame = (Frame) SwingUtilities.getWindowAncestor(this);
