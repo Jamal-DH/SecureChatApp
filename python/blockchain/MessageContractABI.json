@@ -1,0 +1,1 @@
+[{"anonymous": false, "inputs": [{"indexed": false, "internalType": "string", "name": "messageHash", "type": "string"}], "name": "MessageLogged", "type": "event"}, {"inputs": [{"internalType": "string", "name": "messageHash", "type": "string"}], "name": "logMessage", "outputs": [], "stateMutability": "nonpayable", "type": "function"}]

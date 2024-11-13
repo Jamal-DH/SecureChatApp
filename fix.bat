@@ -53,6 +53,10 @@ IF %ERRORLEVEL% NEQ 0 (
 REM --- Upgrade pip to the Latest Version ---
 echo Upgrading pip to the latest version...
 pip install --upgrade pip
+<<<<<<< HEAD
+=======
+pip install --upgrade web3
+>>>>>>> 730ef1f (Added updated SC_Project folder)
 IF %ERRORLEVEL% NEQ 0 (
     echo Failed to upgrade pip.
     pause

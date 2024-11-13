@@ -8,7 +8,11 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
+<<<<<<< HEAD
 set VIRTUAL_ENV=C:\Users\RTX\Desktop\twst\.venv
+=======
+set VIRTUAL_ENV=C:\Users\RTX\Desktop\test\.venv
+>>>>>>> 730ef1f (Added updated SC_Project folder)
 
 if not defined PROMPT set PROMPT=$P$G
 

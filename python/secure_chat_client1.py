@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+# c1.py
+
+>>>>>>> 730ef1f (Added updated SC_Project folder)
 import os
 import sys
 import time
@@ -5,6 +10,10 @@ import ssl
 import socket
 import threading
 import logging
+<<<<<<< HEAD
+=======
+import hashlib
+>>>>>>> 730ef1f (Added updated SC_Project folder)
 import requests
 import paramiko
 import customtkinter as ctk  # Import CustomTkinter
@@ -21,6 +30,9 @@ from Steganography import SteganographyApp
 from usb_auth_handle import authenticate_usb
 from status_monitor import StatusMonitor, StatusWindow
 
+
+# Import blockchain modules
+from blockchain.blockchain_interface import BlockchainInterface
 
 # Configuration
 MAX_ATTEMPTS = 5  # Define the maximum number of authentication attempts
@@ -46,6 +58,15 @@ class ChatClient:
         self.client_socket = None
         self.failed_attempts = 0
         self.lockout_time = 0
+<<<<<<< HEAD
+=======
+
+        # Initialize the blockchain interface
+        self.blockchain = BlockchainInterface()
+
+        # Initialize shared_key to None
+        self.shared_key = None
+>>>>>>> 730ef1f (Added updated SC_Project folder)
 
         # Fix the window size to prevent resizing
         self.master.geometry("750x230")
@@ -167,41 +188,68 @@ class ChatClient:
             self.client_socket.connect((self.host, int(self.server_port)))
             logger.info(f"Connected to server on port {self.server_port} from client port {self.client_port}")
 
+            # Exchange public keys for ECDH
             server_public_key_bytes = self.client_socket.recv(4096)
-            self.server_public_key = serialization.load_pem_public_key(server_public_key_bytes)
+            if not server_public_key_bytes:
+                raise ValueError("Failed to receive server's public key.")
+            # No need to load server's public key here since derive_shared_key handles it
             self.client_socket.send(self.public_key.public_bytes(
                 encoding=serialization.Encoding.PEM,
                 format=serialization.PublicFormat.SubjectPublicKeyInfo
             ))
 
+            # Derive shared key
             self.shared_key = derive_shared_key(self.private_key, server_public_key_bytes)
+            if not self.shared_key:
+                raise ValueError("Shared key derivation returned None.")
             logger.info(f"Derived shared key for client {self.client_id}: {self.shared_key.hex()}")
 
+            # Update the window title and size
             self.master.title(f"Secure Chat Client {self.client_id}")
             self.master.geometry("600x680")
             self.master.configure(fg_color="#1a1a1a")
             self.master.geometry(f'+{position[0]}+{position[1]}')
 
+            # Create UI components
             self.create_menu_bar()
             self.create_widgets()
 
+<<<<<<< HEAD
             #self.status_Monitor = StatusWindow(alert_callback=self.handle_alert)
             #self.status_Monitor.start()
 
+=======
+            # Start a thread to receive messages
+>>>>>>> 730ef1f (Added updated SC_Project folder)
             self.receive_thread = threading.Thread(target=self.receive_messages, daemon=True)
             self.receive_thread.start()
 
+        except (ValueError, ssl.SSLError) as e:
+            logger.error(f"Shared key derivation failed: {e}")
+            messagebox.showerror("Shared Key Error", f"Shared key derivation failed: {e}")
+            self.master.quit()
         except socket.error as e:
             logger.error(f"Unable to connect to server: {e}")
             messagebox.showerror("Connection Error", f"Unable to connect to server: {e}")
             self.master.quit()
+        except Exception as e:
+            logger.error(f"An unexpected error occurred: {e}")
+            messagebox.showerror("Error", f"An unexpected error occurred: {e}")
+            self.master.quit()
 
     def check_ip_address(self):
         # Alternative Services:
+<<<<<<< HEAD
         # https://api64.ipify.org?format=json 
         # https://ifconfig.me/all.json
         # https://ip-api.com/json
 	# http://ipinfo.io/json
+=======
+        # https://api64.ipify.org?format=json
+        # https://ifconfig.me/all.json
+        # https://ip-api.com/json
+        # http://ipinfo.io/json
+>>>>>>> 730ef1f (Added updated SC_Project folder)
         try:
             response = requests.get('https://api64.ipify.org?format=json')
             response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
@@ -251,8 +299,13 @@ class ChatClient:
         """
         Open the Status window to display real-time status information.
         """
+<<<<<<< HEAD
        # self.status_monitor.start()
        # status_window = StatusWindow(self.master, self.status_monitor)
+=======
+        self.status_monitor.start()
+        status_window = StatusWindow(self.master, self.status_monitor)
+>>>>>>> 730ef1f (Added updated SC_Project folder)
 
     def handle_alert(self, alert):
         """
@@ -403,33 +456,75 @@ class ChatClient:
         self.master.grid_columnconfigure(1, weight=0)
 
     def send_message(self, event=None):
-        message = self.entryMsg.get()
-        if message.strip():
+        raw_message = self.entryMsg.get()
+        message = raw_message.strip()
+        if message:
             try:
-                encrypted_message = encrypt_message(self.shared_key, message)
-                self.client_socket.sendall(encrypted_message.encode('utf-8'))
+                # Encrypt the message
+                encrypted_message = encrypt_message(self.shared_key, message)  # Returns bytes
+                self.client_socket.sendall(encrypted_message)  # sendall sends all bytes
+                logger.debug(f"Sent encrypted message of length {len(encrypted_message)} bytes")
                 self.display_message(f"You: {message}")
                 self.entryMsg.delete(0, 'end')
+
+                # Hash the message (hex string)
+                message_hash = hashlib.sha256(message.encode('utf-8')).hexdigest()
+                logger.info(f"Sender's computed message hash: {message_hash}")
+
+                # Log the hash to the blockchain as a string
+                tx_receipt = self.blockchain.log_message(message_hash)
+                logger.info(f"Message hash logged to blockchain in transaction {tx_receipt.transactionHash.hex()}")
+
             except socket.error as e:
                 logger.error(f"Unable to send message: {e}")
                 messagebox.showerror("Send Error", f"Unable to send message: {e}")
                 self.client_socket.close()
+            except Exception as e:
+                logger.error(f"Failed to log message hash to blockchain: {e}")
+                messagebox.showerror("Blockchain Error", f"Failed to log message to blockchain: {e}")
         else:
             logger.warning("Empty message not sent")
 
     def receive_messages(self):
         while True:
             try:
-                encrypted_message = self.client_socket.recv(4096).decode('utf-8')
+                # Receive the encrypted message from the server
+                encrypted_message = self.client_socket.recv(4096)  # bytes
                 if not encrypted_message:
                     break
-                decrypted_message = decrypt_message(self.shared_key, encrypted_message)
+
+                # Decrypt the message
+                decrypted_message = decrypt_message(self.shared_key, encrypted_message)  # returns str or None
                 if decrypted_message:
-                    self.display_message(decrypted_message)
+                    decrypted_message = decrypted_message.strip()
+                    # Compute the hash of the decrypted message
+                    message_hash = hashlib.sha256(decrypted_message.encode('utf-8')).hexdigest()
+                    logger.info(f"Recipient's computed message hash: {message_hash}")
+
+                    # Verify if the message hash exists on the blockchain
+                    hashes_on_chain = self.blockchain.get_past_messages()  # List of strings
+                    logger.debug(f"Hashes on blockchain: {hashes_on_chain}")
+
+                    if message_hash in hashes_on_chain:
+                        verification_status = "Message verified on blockchain."
+                    else:
+                        verification_status = "Message not found on blockchain."
+
+                    # Display the message with verification status
+                    self.display_message(f"{decrypted_message} ({verification_status})")
+                else:
+                    logger.warning("Failed to decrypt received message.")
+                    self.display_message("(Failed to decrypt message.)")
             except socket.error as e:
                 logger.error(f"Unable to receive message: {e}")
                 messagebox.showerror("Receive Error", f"Unable to receive message: {e}")
                 break
+            except Exception as e:
+                logger.error(f"Failed to verify message hash against blockchain: {e}")
+                if 'decrypted_message' in locals():
+                    self.display_message(f"{decrypted_message} (Blockchain verification failed.)")
+                else:
+                    self.display_message(f"(Blockchain verification failed.)")
 
     def display_message(self, message):
         self.textCons.configure(state="normal")
@@ -440,10 +535,24 @@ class ChatClient:
     def close_connection(self):
         logger.info(f"Client {self.client_id} is closing connection")
         try:
+<<<<<<< HEAD
             if self.client_socket:
                 self.client_socket.sendall(
                     encrypt_message(self.shared_key, f"Client {self.client_id} has left the chat.").encode('utf-8')
                 )
+=======
+            if self.client_socket and hasattr(self, 'shared_key') and self.shared_key:
+                # Encrypt the disconnect message
+                disconnect_message = f"Client {self.client_id} has left the chat."
+                encrypted_disconnect = encrypt_message(self.shared_key, disconnect_message)  # Returns bytes
+                self.client_socket.sendall(encrypted_disconnect)  # Correct: send bytes directly
+                self.client_socket.close()
+                logger.info(f"Disconnect message sent for client {self.client_id}")
+            else:
+                logger.warning(f"Shared key not set for client {self.client_id}. Sending disconnect message as plain text.")
+                disconnect_message = f"Client {self.client_id} has left the chat."
+                self.client_socket.sendall(disconnect_message.encode('utf-8'))  # Correct: encoding string to bytes
+>>>>>>> 730ef1f (Added updated SC_Project folder)
                 self.client_socket.close()
         except Exception as e:
             logger.error(f"Error sending disconnect message: {e}")
@@ -451,12 +560,17 @@ class ChatClient:
 
 
 if __name__ == "__main__":
-    root = ctk.CTk()
+    if len(sys.argv) != 5:
+        print("Usage: python c1.py <host> <server_port> <client_port> <client_id>")
+        sys.exit(1)
+
     host = sys.argv[1]
     server_port = sys.argv[2]
     client_port = sys.argv[3]
     client_id = sys.argv[4]
     position = (100, 100) if client_id == "c1" else (800, 100)
+
+    root = ctk.CTk()
     client = ChatClient(root, host, server_port, client_port, client_id, position)
     root.protocol("WM_DELETE_WINDOW", client.close_connection)
     root.mainloop()
