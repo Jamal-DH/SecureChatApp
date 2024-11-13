@@ -10,7 +10,7 @@ __pycache__/
 
 # Ignore log files
 *.log
-
+.venv/
 # Ignore other system files
 .DS_Store
 Thumbs.db
