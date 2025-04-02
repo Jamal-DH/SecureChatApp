@@ -1,0 +1,40 @@
+2025-02-18 00:47:16,836 - INFO - ECDH key pair generated successfully
+2025-02-18 00:47:16,841 - INFO - ECDH key pair generated successfully
+2025-02-18 00:47:16,913 - INFO - Authentication successful.
+2025-02-18 00:47:16,913 - INFO - Authentication successful.
+2025-02-18 00:47:18,061 - INFO - Configuring TLS context for client...
+2025-02-18 00:47:18,111 - INFO - Client socket bound to port 12346
+2025-02-18 00:47:18,116 - INFO - Connected to server on port 12345 from client port 12346
+2025-02-18 00:47:18,603 - INFO - Configuring TLS context for client...
+2025-02-18 00:47:18,649 - INFO - Client socket bound to port 12347
+2025-02-18 00:47:18,653 - INFO - Connected to server on port 12345 from client port 12347
+2025-02-18 00:47:18,654 - INFO - Shared key derived successfully
+2025-02-18 00:47:18,655 - INFO - Derived shared key for client c2
+2025-02-18 00:47:18,655 - DEBUG - Shared key hash for client c2: 20e880dba98058a6ff8f430b76d4b301a7cd4a811b0b7374cf151ab1d211f90c
+2025-02-18 00:47:19,123 - INFO - Shared key derived successfully
+2025-02-18 00:47:19,125 - INFO - Derived shared key for client c1
+2025-02-18 00:47:19,125 - DEBUG - Shared key hash for client c1: 20e880dba98058a6ff8f430b76d4b301a7cd4a811b0b7374cf151ab1d211f90c
+2025-02-18 00:47:21,840 - INFO - Client c1 is closing connection
+2025-02-18 00:47:23,686 - INFO - Client c2 is closing connection
+2025-02-18 00:47:47,660 - INFO - ECDH key pair generated successfully
+2025-02-18 00:47:47,664 - INFO - ECDH key pair generated successfully
+2025-02-18 00:47:47,719 - INFO - Authentication successful.
+2025-02-18 00:47:47,720 - INFO - Authentication successful.
+2025-02-18 00:47:48,838 - INFO - Configuring TLS context for client...
+2025-02-18 00:47:48,887 - INFO - Client socket bound to port 12347
+2025-02-18 00:47:48,892 - INFO - Connected to server on port 12345 from client port 12347
+2025-02-18 00:47:50,355 - INFO - Configuring TLS context for client...
+2025-02-18 00:47:50,405 - INFO - Client socket bound to port 12346
+2025-02-18 00:47:50,409 - INFO - Connected to server on port 12345 from client port 12346
+2025-02-18 00:47:50,411 - INFO - Shared key derived successfully
+2025-02-18 00:47:50,411 - INFO - Derived shared key for client c1
+2025-02-18 00:47:50,411 - DEBUG - Shared key hash for client c1: cd61a53d6a809acdc8e05bbc2322d4d55e22381cd272ccb3eceb8e113c6f3fd8
+2025-02-18 00:47:50,894 - INFO - Shared key derived successfully
+2025-02-18 00:47:50,894 - INFO - Derived shared key for client c2
+2025-02-18 00:47:50,894 - DEBUG - Shared key hash for client c2: cd61a53d6a809acdc8e05bbc2322d4d55e22381cd272ccb3eceb8e113c6f3fd8
+2025-02-18 00:48:30,895 - INFO - File selected: C:\Users\RTX\Pictures\Camera Roll\butterfly-neon-glowing-dark-background-amoled-3840x2160-2171.png
+2025-02-18 00:48:34,921 - ERROR - Failed to establish SSH connection: [Errno None] Unable to connect to port 22 on 127.0.0.1 or ::1
+2025-02-18 00:48:41,803 - INFO - Attempting to send file from path: C:\Users\RTX\Pictures\Camera Roll\butterfly-neon-glowing-dark-background-amoled-3840x2160-2171.png
+2025-02-18 00:48:41,803 - ERROR - Failed to send file via SFTP: SSH client is not connected. Cannot establish SFTP session.
+2025-02-18 00:48:52,737 - INFO - Client c2 is closing connection
+2025-02-18 00:48:53,962 - INFO - Client c1 is closing connection

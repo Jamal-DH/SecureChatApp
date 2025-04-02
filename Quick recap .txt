@@ -1,0 +1,149 @@
+░█▀▀█ ░█▀▀█ ░█▀▀▀█ ───░█ ░█▀▀▀ ░█▀▀█ ▀▀█▀▀ 　 ░█▀▀▀█ ░█─░█ ░█▀▄▀█ ░█▀▄▀█ ─█▀▀█ ░█▀▀█ ░█──░█ 
+░█▄▄█ ░█▄▄▀ ░█──░█ ─▄─░█ ░█▀▀▀ ░█─── ─░█── 　 ─▀▀▀▄▄ ░█─░█ ░█░█░█ ░█░█░█ ░█▄▄█ ░█▄▄▀ ░█▄▄▄█ 
+░█─── ░█─░█ ░█▄▄▄█ ░█▄▄█ ░█▄▄▄ ░█▄▄█ ─░█── 　 ░█▄▄▄█ ─▀▄▄▀ ░█──░█ ░█──░█ ░█─░█ ░█─░█ ──░█──
+
+🔹 1. Application Startup
+
+    The server and clients start running from the main script.
+    The app checks for SSL certificates in the cert directory:
+        If missing, it generates new self-signed certificates.
+        If present, it loads existing certificates.
+
+🔹 2. Server Initialization
+
+    The server starts on a specified port (e.g., 12345).
+    It uses TLS encryption with its certificate (server_cert.pem).
+    It listens for incoming client connections.
+
+🔹 3. Clients Start & Authenticate
+
+    Each client runs and first performs USB authentication:
+        If USB is missing or invalid, authentication fails.
+        If USB authentication is successful, the client proceeds.
+
+    The client then configures its TLS context using its certificate (client_cert.pem).
+
+🔹 4. Clients Connect to Server
+
+    Each client binds to its own port (e.g., 12346, 12347).
+    It establishes a secure connection with the server.
+    The server authenticates the clients using their certificates.
+
+🔹 5. Secure Key Exchange (ECDH)
+
+    Each client generates an ECDH key pair (public + private).
+    The public keys are exchanged between the two clients via the server.
+    A shared encryption key is derived using ECDH for secure message encryption.
+
+🔹 6. Sending & Receiving Messages
+
+    Client 1 writes a message.
+    The message is encrypted using AES-GCM with the derived key.
+    The encrypted message (along with IV + Tag) is sent to the server.
+    The server relays the encrypted message to Client 2.
+    Client 2 decrypts the message and displays it in the chat.
+
+🔹 7. Extra Features
+
+    File Transfer: Secure SFTP is used for sending files.
+    Steganography: Hidden messages can be embedded inside images.
+    Shredding: Secure deletion of files to prevent forensic recovery.
+    Logging & Alerts: Security events (e.g., failed logins) trigger email alerts.
+    IP Lookup: Clients can check their public IP.
+
+🔹 8. Client Disconnects
+
+    If a client closes the app, it notifies the server.
+    The secure connection is closed, and the app exits cleanly.
+
+🔹 Summary
+
+The app ensures secure end-to-end communication with:
+✔ TLS 1.3 encryption (SSL Certificates) 
+✔ ECDH for key exchange (Perfect Forward Secrecy)
+✔ AES-GCM for secure message encryption
+✔ USB authentication for extra security
+✔ Steganography, file transfer, and system alerts
+
+
+📌 Step 1: Certificates Are Used for Authentication
+
+    The server has a self-signed certificate (server_cert.pem).
+    Each client has its own self-signed certificate (client_cert.pem).
+    When a client connects to the server, both exchange certificates.
+
+📌 Step 2: Verifying Certificates
+
+    The client checks the server’s certificate (server_cert.pem).
+        If valid, it ensures it’s connecting to the real server (prevents MITM attacks).
+        If invalid, the connection is rejected.
+
+    The server can optionally verify the client’s certificate (client_cert.pem).
+        This ensures that only authenticated clients can join.
+        If client authentication is disabled (CERT_NONE mode), the server only requires a secure connection.
+
+2️⃣ Key Exchange Process
+
+After authentication, the server and clients establish a shared secret key for encryption.
+📌 Step 3: ECDH (Elliptic Curve Diffie-Hellman) Key Exchange
+
+    Each client and the server generates an ECDH key pair:
+        Private key (kept secret).
+        Public key (shared with others).
+
+    Clients send their public keys to the server.
+        Each client’s public key is sent to the server using TLS.
+
+    The server relays each client’s public key to the other client.
+        If Client 1 connects, it receives Client 2’s public key (and vice versa).
+        Now, each client has both its own private key and the peer’s public key.
+
+3️⃣ How They Use the Shared Key
+📌 Step 4: Deriving the Shared Secret
+
+Once a client has:
+
+    Its private key
+    The other client’s public key
+    It derives a shared key using ECDH:
+
+shared_key=ECDH(my private key,peer’s public key)
+shared_key=ECDH(my private key,peer’s public key)
+
+This key is identical for both clients.
+4️⃣ Using the Shared Key for Secure Messaging
+
+Now that both clients have the same shared key, they can securely encrypt and decrypt messages.
+📌 Step 5: Encrypting Messages
+
+Before sending a message:
+
+    The sender encrypts the message using AES-GCM with the shared key.
+    The encrypted message is sent to the server.
+    The server relays the encrypted message to the other client.
+
+📌 Step 6: Decrypting Messages
+
+    The receiver receives the encrypted message from the server.
+    It decrypts the message using the same shared key.
+
+Since both clients derived the same key, they can successfully encrypt and decrypt messages without exchanging the key directly.
+✅ Summary: How Authentication and Key Exchange Work
+
+1️⃣ TLS Handshake for Authentication
+
+    Clients and the server exchange certificates.
+    The client verifies the server’s certificate (prevents MITM attacks).
+    The server optionally verifies client certificates.
+
+2️⃣ ECDH Key Exchange
+
+    Clients and server generate ECDH key pairs.
+    The server exchanges clients’ public keys.
+    Clients derive a shared secret key using ECDH.
+
+3️⃣ Secure Communication Using AES-GCM
+
+    Messages are encrypted using AES-GCM with the shared key.
+    The server only relays encrypted messages (it can't decrypt them).
+    The receiver decrypts the message using the same key.
