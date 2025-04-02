@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.log
+
+# Java
+*.class
+
+# Certs (optional, if sensitive)
+*.pem
+*.key
+
+# OS
+.DS_Store
+Thumbs.db
