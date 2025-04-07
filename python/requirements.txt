@@ -1,4 +1,4 @@
-cryptography==42.0.8
+cryptography==44.0.1
 customtkinter==5.2.2
 GPUtil==1.4.0
 paramiko==3.4.1
