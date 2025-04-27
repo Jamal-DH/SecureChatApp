@@ -12,6 +12,7 @@ build/
 # Certs (optional, if sensitive)
 *.pem
 *.key
+*.env
 
 # OS
 .DS_Store
